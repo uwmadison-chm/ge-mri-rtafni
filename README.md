@@ -14,6 +14,8 @@ This is designed to have the minimal possible footprint on the running scanner. 
 
 It does use pydicom to decide what files to copy (let's not bother with things that aren't dicoms) and where to put them (<exam>-<series>). We don't rely on the handler on the upload host to sort the files, as we don't know the handler will be running when we start copying files.
 
+Really, though: just leave the damn handler running.
+
 ### Data upload host
 
 This does some More Stuff.
