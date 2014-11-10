@@ -36,5 +36,6 @@ This package tries to be free of external dependencies; therefore, we ship with 
 * [pydicom](https://code.google.com/p/pydicom/) Copyright (c) 2008-2010 Darcy Mason and pydicom contributors
 * [pyinotify](https://github.com/seb-m/pyinotify) Copyright (c) 2010 Sebastien Martini <seb@dbzteam.org>
 * [docopt](https://github.com/docopt/docopt) Copyright (c) 2012 Vladimir Keleshev, <vladimir@keleshev.com>
+* [schema](https://github.com/keleshev/schema) Copyright (c) 2012 Vladimir Keleshev, <vladimir@keleshev.com>
 
 ge-mri-rtafni was written by Nate Vack <njvack@wisc.edu> and is Copyright 2014 the Board of Regents of the University of Wisconsin System. It's MIT-licensed; see LICENSE if you don't know what that means.
