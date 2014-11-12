@@ -14,7 +14,7 @@ Options:
   --filter-module=<mod>   [default: is_dicom] This must be the name of a
                           python module that implements a filter() method.
                           This method will take a filename and return a
-                          dicom dataset or None.
+                          dicom dataset or None/False.
 """
 
 import os
@@ -52,8 +52,6 @@ class DicomCopier(pyinotify.ProcessEvent):
                     event.pathname,
                     dest_dir,
                     os.path.basename(event.pathname)))
-        else:
-            logging.debug("{0} is not a dicom.".format(event.pathname))
 
     def _make_or_get_dest_dir(self, dcm):
         """ Computes a directory name for a dicom, and creates it if needed.
