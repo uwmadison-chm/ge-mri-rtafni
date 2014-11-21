@@ -12,13 +12,20 @@ filename. This function will either return a Dicom (from pydicom) or None.
 import logging
 import dicom
 
+REQUIRED_TAGS = ['StudyID', 'SeriesNumber', 'InstanceNumber']
+
 
 def filter(filename):
     dcm = None
+
     try:
         dcm = dicom.read_file(filename)
     except:
         logging.debug("{0}: Not a readable DICOM".format(filename))
-    if hasattr(dcm, 'StudyID') and hasattr(dcm, 'SeriesNumber'):
-        return dcm
-    return None
+        return None
+
+    if not all([hasattr(dcm, tag) for tag in REQUIRED_TAGS]):
+        logging.debug("{0}: Missing required tag".format(filename))
+        return None
+
+    return dcm
