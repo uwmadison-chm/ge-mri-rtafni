@@ -42,16 +42,20 @@ class DicomCopier(pyinotify.ProcessEvent):
 
         This determines whether it's an appropriate DICOM with the filter,
         then gets (or creates) a directory for it, and copies the file.
+
+        Files are automatically named with InstanceNumber to ensure they'll
+        sort correctly.
         """
         dcm = self.dicom_filter.filter(event.pathname)
         if dcm:
             dest_dir = self._make_or_get_dest_dir(dcm)
+            dest_filename = "{0:09d}.dcm".format(dcm.InstanceNumber)
+            dest_file = os.path.join(dest_dir, dest_filename)
             if dest_dir:
-                shutil.copy(event.pathname, dest_dir)
-                logging.debug("{0} -> {1}/{2}".format(
+                shutil.copy(event.pathname, dest_file)
+                logging.debug("{0} -> {1}".format(
                     event.pathname,
-                    dest_dir,
-                    os.path.basename(event.pathname)))
+                    dest_file))
 
     def _make_or_get_dest_dir(self, dcm):
         """ Computes a directory name for a dicom, and creates it if needed.
@@ -69,6 +73,7 @@ class DicomCopier(pyinotify.ProcessEvent):
 
 
 def watch_for_dicoms(watch_dir, dest_dir, dicom_filter):
+    logging.info("Indexing files, please wait...")
     wm = pyinotify.WatchManager()
     handler = DicomCopier(
         dicom_filter=dicom_filter,
