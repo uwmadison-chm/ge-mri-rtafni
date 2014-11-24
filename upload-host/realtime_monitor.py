@@ -28,8 +28,10 @@ vendor_dir = os.path.join(parent_dir, 'vendor')
 
 sys.path.insert(1, vendor_dir)
 from docopt import docopt
-import pyinotify
 import dicom
+import pyinotify
+# pyinotify raises warnings if we unwatch a directory that still has pending
+# events, which happens sometimes here.
 pyinotify.log.setLevel(logging.ERROR)
 
 
