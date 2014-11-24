@@ -10,11 +10,30 @@ There are two main components to this:
 
 ### Scanner console uploader
 
-This is designed to have the minimal possible footprint on the running scanner. It uses inotify (really, pyinotify) to watch for incoming files in the dicom store and copy them to an NFS-mounted directory on the data upload host.
+This is designed to have a minimal footprint on the running scanner. It uses inotify (really, pyinotify) to watch for incoming files in the dicom store and copy them to an NFS-mounted directory on the data upload host.
 
-It does use pydicom to decide what files to copy (let's not bother with things that aren't dicoms) and where to put them (<exam>-<series>). We don't rely on the handler on the upload host to sort the files, as we don't know the handler will be running when we start copying files.
+The program you'll run on the scanner console is `realtime_dicom_copy`:
 
-Really, though: just leave the damn handler running.
+```
+Realtime DICOM copier.
+
+Usage:
+  realtime_dicom_copy.py <watch_dir> <dest_dir> [options]
+
+Options:
+  -h --help               Show this screen
+  --version               Show version information
+  -v --verbose            Show lots of logging information
+  --filter-module=<mod>   [default: is_dicom] This must be the name of a
+                          python module that implements a filter() method.
+                          This method will take a filename and return a
+                          dicom dataset or None/False.
+```
+
+See `is_dicom.py` and `fmri_dicom.py` in the `scanner-console` directory to see how the filters work.
+
+For us, the command `realtime_dicom_copy.py /export/home1/sdc_image_pool/images /mri-upload/rtafni --filter=fmri_dicom` starts things working nicely.
+
 
 ### Data upload host
 
@@ -23,9 +42,31 @@ This does some More Stuff.
 The basic idea here is that we watch an incoming directory (and all subdirs) for new files. When we get one:
 
 * Is it a dicom? If not, continue. Else:
-** Stop watching the directory this file came into.
-** Figure out some scan parameters. If we want to realtime this scan (what's that criteria?) run a script that starts Dimon with the appropriate flags.
-** At the end of that script, delete the scan's directory.
+* Stop watching the directory this file came into.
+* From the dicom, determine the number of frames and slices per frame
+* Kick off the viewer script (see `upload-host/bash/rtafni.sh`)
+
+The script you're using here is `upload-host/realtime_monitor.py`:
+
+```
+Watch for DICOM series and start a realtime viewer. Probably realtime AFNI.
+
+Usage:
+  realtime_monitor.py <watch_path> <realtime_script> [options]
+
+Options:
+  -h --help
+  -v --verbose
+
+realtime_script will be called with three arguments:
+  The path to the DICOM series
+  The number of expected slices per frame
+  The number expected frames
+```
+
+`upload-host/bash/rtafni.sh` is a pretty good stab at a `realtime_script`.
+
+Remember that because of the Magic of X11, your upload host need not be the computer you're viewing the data on.
 
 ### Dependencies and credits
 
@@ -36,6 +77,5 @@ This package tries to be free of external dependencies; therefore, we ship with 
 * [pydicom](https://code.google.com/p/pydicom/) Copyright (c) 2008-2010 Darcy Mason and pydicom contributors
 * [pyinotify](https://github.com/seb-m/pyinotify) Copyright (c) 2010 Sebastien Martini <seb@dbzteam.org>
 * [docopt](https://github.com/docopt/docopt) Copyright (c) 2012 Vladimir Keleshev, <vladimir@keleshev.com>
-* [schema](https://github.com/keleshev/schema) Copyright (c) 2012 Vladimir Keleshev, <vladimir@keleshev.com>
 
 ge-mri-rtafni was written by Nate Vack <njvack@wisc.edu> and is Copyright 2014 the Board of Regents of the University of Wisconsin System. It's MIT-licensed; see LICENSE if you don't know what that means.
