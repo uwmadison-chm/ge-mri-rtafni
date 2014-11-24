@@ -41,7 +41,7 @@ This does some More Stuff.
 
 The basic idea here is that we watch an incoming directory (and all subdirs) for new files. When we get one:
 
-* Is it a dicom? If not, continue. Else:
+* Is it a dicom? If not, ignore it. Otherwise...
 * Stop watching the directory this file came into.
 * From the dicom, determine the number of frames and slices per frame
 * Kick off the viewer script (see `upload-host/bash/rtafni.sh`)
