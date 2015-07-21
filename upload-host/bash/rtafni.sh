@@ -9,6 +9,7 @@ export AFNI_REALTIME_Graph=Realtime
 export AFNI_REALTIME_Verbose=No
 export AFNI_TRUSTHOST=localhost
 export AFNI_LAYOUT_FILE=${HOME}/.afni_layout
+mkdir -p "${LOG_DIR}"
 
 start_afni() {
     date >> $LOG_DIR/start_afni
