@@ -38,7 +38,7 @@ start_afni() {
 start_dimon() {
     cd $1
     date >> $LOG_DIR/dimon_start
-    $AFNI_PLUGINPATH/Dimon -infile_pattern '*' -rt -num_slices $2 -nt $3 -host 127.0.0.1 -quit \
+    $AFNI_PLUGINPATH/Dimon -infile_pattern '*' -rt -dicom_org -num_slices $2 -nt $3 -host 127.0.0.1 -quit \
       -rt_cmd "GRAPH_XRANGE $3" -rt_cmd 'GRAPH_YRANGE 2.0' \
       -drive_wait 'CLOSE_WINDOW sagittalimage' \
       -drive_wait 'CLOSE_WINDOW sagittalgraph' &> $LOG_DIR/Dimon.log
