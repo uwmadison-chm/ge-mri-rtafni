@@ -15,7 +15,10 @@ import logging
 import dicom
 
 PULSE_SEQUENCE_TAG = (0x0019, 0x109c)
-FMRI_NAMES = set(['fmri', 'epirt', 'epirt_20', 'epirt_22'])
+
+# Note: These get run through os.path.basename, so if it's 'foo/bar' we just
+# want to look for 'bar'
+FMRI_NAMES = set(['fmri', 'epirt', 'epirt_20', 'epirt_22', 'mux_epi'])
 REQUIRED_TAGS = ['StudyID', 'SeriesNumber', 'InstanceNumber']
 
 
