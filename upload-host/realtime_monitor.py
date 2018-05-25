@@ -35,6 +35,44 @@ import pyinotify
 pyinotify.log.setLevel(logging.ERROR)
 
 
+class DicomInfo(object):
+    def __init__(self, dcm):
+        self.dcm = dcm
+
+    @property
+    def frames(self):
+        return str(self.dcm.NumberOfTemporalPositions)
+
+    @property
+    def slices(self):
+        return str(self.dcm.ImagesInAcquisition)
+
+
+class MultibandDicomInfo(DicomInfo):
+    def __init__(self, dcm):
+        super(MultibandDicomInfo, self).__init__(dcm)
+
+    @property
+    def slices(self):
+        return str(
+            self.dcm.ImagesInAcquisition //
+            self.dcm.NumberOfTemporalPositions)
+
+
+PULSE_SEQUENCE_INFO_CLASSES = {
+    'multiband/mux_epi': MultibandDicomInfo
+}
+
+PSD_NAME_TAG = (0x0019, 0x109c)
+
+
+def make_info(dcm):
+    psd_name = dcm[PSD_NAME_TAG].value
+    info_class = PULSE_SEQUENCE_INFO_CLASSES.get(psd_name, DicomInfo)
+    info = info_class(dcm)
+    return info
+
+
 class DicomWatcher(pyinotify.ProcessEvent):
     """
     This watcher will see a DICOM, look for its total expected frames and
@@ -55,12 +93,8 @@ class DicomWatcher(pyinotify.ProcessEvent):
         # Check for dicomness. If it's a dicom, unwatch this directory and
         # start the viewer.
         dcm = None
-        frames = 0
-        slices = 0
         try:
             dcm = dicom.read_file(event.pathname)
-            frames = str(dcm.NumberOfTemporalPositions)
-            slices = str(dcm.ImagesInAcquisition)
         except:
             logging.info("{0}: Not a readable dicom".format(event.pathname))
             return
@@ -68,8 +102,9 @@ class DicomWatcher(pyinotify.ProcessEvent):
         self.watch_manager.rm_watch(event.wd)
         parent_dir = os.path.dirname(event.pathname)
         logging.info("Opening viewer for {0}".format(parent_dir))
+        info = make_info(dcm)
         subprocess.Popen(
-            [self.realtime_script, parent_dir, slices, frames],
+            [self.realtime_script, parent_dir, info.slices, info.frames],
             close_fds=True)
 
 
