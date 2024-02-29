@@ -1,5 +1,9 @@
 # ge-mri-afni
 
+## This project is archived
+
+It might work for you! But everything it relies on is ancient history. Use at your own risk@
+
 #### Tools to enable realtime fMRI data monitoring on GE scanners
 
 If you came to town looking for a special-purpose software package, you sure have come to the right place. This is a little package to enable monitoring fMRI data collection from GE's MRI scanners, using AFNI's Dimon and viewer. It might work with other kinds of scanners, too; it'll really depend on whether Dimon likes your dicoms.
